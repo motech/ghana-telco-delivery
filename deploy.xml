@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="mtn" basedir=".">
+    <import file="${basedir}/tomcat-tasks.xml"/>
+    
+    <!-- *********************** DOWNLOAD ARTIFACTS************************* -->
+    <target name="download.mtn.from.hudson">
+        <copy todir="${download.dir}" flatten="true" overwrite="true">
+            <resources>
+                <url url="http://${hudson.server}:${hudson.port}/job/${hudson.job.name}/${hudson.build.number}/org.motechproject$ghana-mtn/artifact/org.motechproject/ghana-mtn/${hudson.release.version}/ghana-mtn-${hudson.release.version}.war"/>
+            </resources>
+        </copy>
+        <move file="${download.dir}/ghana-mtn-${hudson.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
+        <echo message="downloaded ghana-mtn-${hudson.release.version}.war from hudson"/>
+    </target>
+
+    <target name="download.mtn.from.nexus">
+        <copy todir="${download.dir}" flatten="true" overwrite="true">
+            <resources>
+                <url url="http://${nexus.server}:${nexus.port}/content/repositories/releases/org/motechproject/ghana-mtn/${nexus.release.version}/ghana-mtn-${nexus.release.version}.war"/>
+            </resources>
+        </copy>
+        <move file="${download.dir}/ghana-mtn-${nexus.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
+        <echo message="downloaded ghana-mtn-${nexus.release.version}.war from nexus"/>
+    </target>
+    
+    <!-- *************************RECREATE COUCHDB************************* -->
+    <target name="drop.mtn.db">
+        <exec executable="curl">
+            <arg value="-s"/>
+            <arg value="-S"/>
+            <arg value="-X"/>
+            <arg value="DELETE"/>
+            <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.mtn.db.name}"/>
+        </exec>
+    </target>
+  
+  <!-- *************************RECREATE MYSQL************************* -->
+    <target name="load.quartz.schema">
+        <path id="dependencies">
+            <fileset file="./lib/mysql-connector-java-5.1.13.jar"/>
+        </path>
+        <sql driver="${mysql.driver}"
+             url="jdbc:mysql://${mysql.server}:${mysql.port}/${mysql.db.name}?autoReconnect=true"
+             userid="${mysql.user}"
+             classpathref="dependencies"
+             password="${mysql.password}">
+            drop database ${mysql.db.name};
+            create database ${mysql.db.name};
+        </sql>
+        <sql driver="${mysql.driver}"
+             url="jdbc:mysql://${mysql.server}:${mysql.port}/${mysql.db.name}?autoReconnect=true"
+             userid="${mysql.user}"
+             classpathref="dependencies"
+             password="${mysql.password}"
+             src="./sql/tables_mysql_innodb.sql">
+        </sql>
+        <echo message="recreated schema for ${mysql.db.name}"/>
+    </target>
+    <!-- *************************SET PROPERTIES************************* -->
+    <target name="set.hudson.version">
+    	<echo file="${tomcat.home}/webapps/${app.name}/META-INF/version.txt">
+    	hudson.release.version=${hudson.release.version}
+    	hudson.build.number=${hudson.build.number}
+    	deploy.time=${cctimestamp}
+    	</echo>
+    </target>	
+    <target name="set.nexus.version">
+    	<echo file="${tomcat.home}/webapps/${app.name}/META-INF/version.txt">
+    	nexus.server=${nexus.server}
+    	nexus.release.version=${nexus.release.version}
+    	deploy.time=${cctimestamp}
+    	</echo>
+    </target>	
+    <!-- *************************DEPLOY TARGETS************************* -->
+    <target name="deploy.mtn.from.hudson.and.reset.db" depends="stop.tomcat, 
+             							 drop.mtn.db,              							
+             							 load.quartz.schema, 
+								 download.mtn.from.hudson, 
+								 copy.mtn.to.tomcat, 
+								 start.tomcat, 	
+								 set.hudson.version,								 
+								 restart.tomcat"
+            description="Deploy mtn by 
+                         1) fetching artifact from hudson, 
+                         2) recreate mtn-web couchdb database with seed data
+                         3) clearing quartz mysql jobdatastore
+			 4) set properties for war"/>
+
+    <target name="deploy.mtn.from.nexus.and.reset.db" depends="stop.tomcat, 
+             							drop.mtn.db, 
+             							load.quartz.schema, 
+								download.mtn.from.nexus, 
+								copy.mtn.to.tomcat, 
+								start.tomcat, 
+								set.nexus.version,
+								restart.tomcat"
+            description="Deploy mtn by 
+                         1) fetching artifact from nexus, 
+                         2) recreate mtn-web couchdb database with seed data
+                         3) clearing quartz mysql jobdatastore
+                         4) set properties for war"/>
+
+    <target name="deploy.mtn.from.hudson" depends="stop.tomcat, 
+ 						    download.mtn.from.hudson, 
+						    copy.mtn.to.tomcat,
+						    start.tomcat,						   
+						    set.hudson.version,
+						    restart.tomcat"
+            description="Deploy mtn from hudson without recreating database and seed data"/>
+
+    <target name="deploy.mtn.from.nexus" depends="stop.tomcat, 
+						   download.mtn.from.nexus, 
+						   copy.mtn.to.tomcat, 
+ 						   start.tomcat, 						 
+						   set.nexus.version,
+						   restart.tomcat"
+            description="Deploy mtn from nexus without recreating database and seed data"/>
+
+    <target name="deploy.mtn.from.local" depends="stop.tomcat, 
+					  	   copy.local.war,
+ 						   start.tomcat, 						
+						   restart.tomcat"
+            description="Deploy mtn from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder without recreating database and seed data"/>
+
+    <target name="deploy.mtn.from.local.and.reset.db" depends="stop.tomcat,
+                                                   drop.mtn.db,                                                
+                                                   load.quartz.schema, 
+					  	   copy.local.war,
+ 						   start.tomcat,						  
+						   restart.tomcat"
+            description="Deploy mtn from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder. Also recreates the mtn database."/>
+
+</project>
