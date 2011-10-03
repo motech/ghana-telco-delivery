@@ -83,6 +83,18 @@
               file="${basedir}/properties/${env}/log4j.xml"/>
     </target>
 
+    <!-- ************************LOAD SEED DATA ************************* -->
+    <target name="load.seed.data">
+        <echo message="please wait ..."/>
+        <java fork="false" classname="${couchdb.seed.main.class}">
+            <classpath>
+                <path location="${tomcat.home}/webapps/${app.name}/WEB-INF/classes"/>
+                <path refid="lib.path"/>
+            </classpath>
+        </java>
+        <echo message="seed data loaded into ${couchdb.tama.db.name} database"/>
+    </target>
+
     <!-- *************************DEPLOY TARGETS************************* -->
     <target name="deploy.mtn.from.hudson.and.reset.db" depends="stop.tomcat, 
              							 drop.mtn.db,              							
