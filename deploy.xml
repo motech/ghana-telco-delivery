@@ -92,7 +92,7 @@
                 <path refid="lib.path"/>
             </classpath>
         </java>
-        <echo message="seed data loaded into ${couchdb.tama.db.name} database"/>
+        <echo message="seed data loaded into ${couchdb.mtn.db.name} database"/>
     </target>
 
     <!-- *************************DEPLOY TARGETS************************* -->
@@ -103,7 +103,8 @@
 								 copy.mtn.to.tomcat, 
 								 start.tomcat, 	
 								 set.properties,
-								 set.hudson.version,								 
+								 set.hudson.version,
+								 load.seed.data,
 								 restart.tomcat"
             description="Deploy mtn by 
                          1) fetching artifact from hudson, 
@@ -119,6 +120,7 @@
 								start.tomcat, 
 								set.properties,
 								set.nexus.version,
+								 load.seed.data,
 								restart.tomcat"
             description="Deploy mtn by 
                          1) fetching artifact from nexus, 
@@ -132,6 +134,7 @@
 						    start.tomcat, 						   
 					            set.properties,
 						    set.hudson.version,
+								 load.seed.data,
 						    restart.tomcat"
             description="Deploy mtn from hudson without recreating database and seed data"/>
 
@@ -141,6 +144,7 @@
  						   start.tomcat, 						 
 					           set.properties,
 						   set.nexus.version,
+								 load.seed.data,
 						   restart.tomcat"
             description="Deploy mtn from nexus without recreating database and seed data"/>
 
@@ -148,6 +152,7 @@
 					  	   copy.local.war,
  						   start.tomcat, 						
 					           set.properties,
+								 load.seed.data,
 						   restart.tomcat"
             description="Deploy mtn from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder without recreating database and seed data"/>
 
@@ -157,6 +162,7 @@
 					  	   copy.local.war,
  						   start.tomcat,						  
 					           set.properties,
+								 load.seed.data,
 						   restart.tomcat"
             description="Deploy mtn from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder. Also recreates the mtn database."/>
 
