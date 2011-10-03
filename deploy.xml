@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="mtn" basedir=".">
     <import file="${basedir}/tomcat-tasks.xml"/>
-    
+
     <!-- *********************** DOWNLOAD ARTIFACTS************************* -->
     <target name="download.mtn.from.hudson">
         <copy todir="${download.dir}" flatten="true" overwrite="true">
@@ -22,7 +22,7 @@
         <move file="${download.dir}/ghana-mtn-${nexus.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
         <echo message="downloaded ghana-mtn-${nexus.release.version}.war from nexus"/>
     </target>
-    
+
     <!-- *************************RECREATE COUCHDB************************* -->
     <target name="drop.mtn.db">
         <exec executable="curl">
@@ -33,8 +33,8 @@
             <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.mtn.db.name}"/>
         </exec>
     </target>
-  
-  <!-- *************************RECREATE MYSQL************************* -->
+
+    <!-- *************************RECREATE MYSQL************************* -->
     <target name="load.quartz.schema">
         <path id="dependencies">
             <fileset file="./lib/mysql-connector-java-5.1.13.jar"/>
@@ -58,19 +58,19 @@
     </target>
     <!-- *************************SET PROPERTIES************************* -->
     <target name="set.hudson.version">
-    	<echo file="${tomcat.home}/webapps/${app.name}/META-INF/version.txt">
-    	hudson.release.version=${hudson.release.version}
-    	hudson.build.number=${hudson.build.number}
-    	deploy.time=${cctimestamp}
-    	</echo>
-    </target>	
+        <echo file="${tomcat.home}/webapps/${app.name}/META-INF/version.txt">
+            hudson.release.version=${hudson.release.version}
+            hudson.build.number=${hudson.build.number}
+            deploy.time=${cctimestamp}
+        </echo>
+    </target>
     <target name="set.nexus.version">
-    	<echo file="${tomcat.home}/webapps/${app.name}/META-INF/version.txt">
-    	nexus.server=${nexus.server}
-    	nexus.release.version=${nexus.release.version}
-    	deploy.time=${cctimestamp}
-    	</echo>
-    </target>	
+        <echo file="${tomcat.home}/webapps/${app.name}/META-INF/version.txt">
+            nexus.server=${nexus.server}
+            nexus.release.version=${nexus.release.version}
+            deploy.time=${cctimestamp}
+        </echo>
+    </target>
 
     <target name="set.properties">
         <copy overwrite="true" todir="${tomcat.home}/webapps/${app.name}/WEB-INF/classes"
@@ -84,6 +84,10 @@
     </target>
 
     <!-- ************************LOAD SEED DATA ************************* -->
+    <path id="lib.path">
+        <fileset dir="${tomcat.home}/webapps/${app.name}/WEB-INF/lib" includes="**/*.jar"/>
+    </path>
+
     <target name="load.seed.data">
         <echo message="please wait ..."/>
         <java fork="false" classname="${couchdb.seed.main.class}">
