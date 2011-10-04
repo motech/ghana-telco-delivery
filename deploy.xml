@@ -6,7 +6,7 @@
     <target name="download.mtn.from.hudson">
         <copy todir="${download.dir}" flatten="true" overwrite="true">
             <resources>
-                <url url="http://${hudson.server}:${hudson.port}/job/${hudson.job.name}/${hudson.build.number}/org.motechproject$ghana-mtn-web/artifact/org.motechproject/ghana-mtn-web/${hudson.release.version}/ghana-mtn-${hudson.release.version}.war"/>
+                <url url="http://${hudson.server}:${hudson.port}/job/${hudson.job.name}/${hudson.build.number}/org.motechproject$ghana-mtn-web/artifact/org.motechproject/ghana-mtn-web/${hudson.release.version}/ghana-mtn-web${hudson.release.version}.war"/>
             </resources>
         </copy>
         <move file="${download.dir}/ghana-mtn-${hudson.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
