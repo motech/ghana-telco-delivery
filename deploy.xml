@@ -24,13 +24,23 @@
     </target>
 
     <!-- *************************RECREATE COUCHDB************************* -->
-    <target name="drop.mtn.db">
+    <target name="drop.mtn.web.db">
         <exec executable="curl">
             <arg value="-s"/>
             <arg value="-S"/>
             <arg value="-X"/>
             <arg value="DELETE"/>
-            <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.mtn.db.name}"/>
+            <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.mtn.web.db}"/>
+        </exec>
+    </target>	
+    
+    <target name="drop.mtn.billing.db">
+        <exec executable="curl">
+            <arg value="-s"/>
+            <arg value="-S"/>
+            <arg value="-X"/>
+            <arg value="DELETE"/>
+            <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.mtn.billing.db}"/>
         </exec>
     </target>
 
@@ -96,12 +106,13 @@
                 <path refid="lib.path"/>
             </classpath>
         </java>
-        <echo message="seed data loaded into ${couchdb.mtn.db.name} database"/>
+        <echo message="seed data loaded into ${couchdb.mtn.web.db} database"/>
     </target>
 
     <!-- *************************DEPLOY TARGETS************************* -->
     <target name="deploy.mtn.from.hudson.and.reset.db" depends="stop.tomcat, 
-             							 drop.mtn.db,              							
+             							 drop.mtn.web.db,    
+             							 drop.mtn.billing.db          							
              							 load.quartz.schema, 
 								 download.mtn.from.hudson, 
 								 copy.mtn.to.tomcat, 
@@ -117,7 +128,8 @@
 			 4) set properties for war"/>
 
     <target name="deploy.mtn.from.nexus.and.reset.db" depends="stop.tomcat, 
-             							drop.mtn.db, 
+             							drop.mtn.web.db, 
+             							drop.mtn.billing.db,
              							load.quartz.schema, 
 								download.mtn.from.nexus, 
 								copy.mtn.to.tomcat, 
@@ -138,7 +150,7 @@
 						    start.tomcat, 						   
 					            set.properties,
 						    set.hudson.version,
-								 load.seed.data,
+						    load.seed.data,
 						    restart.tomcat"
             description="Deploy mtn from hudson without recreating database and seed data"/>
 
@@ -148,7 +160,7 @@
  						   start.tomcat, 						 
 					           set.properties,
 						   set.nexus.version,
-								 load.seed.data,
+						   load.seed.data,
 						   restart.tomcat"
             description="Deploy mtn from nexus without recreating database and seed data"/>
 
@@ -156,17 +168,18 @@
 					  	   copy.local.war,
  						   start.tomcat, 						
 					           set.properties,
-								 load.seed.data,
+					           load.seed.data,
 						   restart.tomcat"
             description="Deploy mtn from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder without recreating database and seed data"/>
 
     <target name="deploy.mtn.from.local.and.reset.db" depends="stop.tomcat,
-                                                   drop.mtn.db,                                                
+                                                   drop.mtn.web.db,     
+                                                   drop.mtn.billing.db,                                           
                                                    load.quartz.schema, 
 					  	   copy.local.war,
  						   start.tomcat,						  
 					           set.properties,
-								 load.seed.data,
+						   load.seed.data,
 						   restart.tomcat"
             description="Deploy mtn from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder. Also recreates the mtn database."/>
 
