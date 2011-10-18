@@ -112,7 +112,7 @@
     <!-- *************************DEPLOY TARGETS************************* -->
     <target name="deploy.mtn.from.hudson.and.reset.db" depends="stop.tomcat, 
              							 drop.mtn.web.db,    
-             							 drop.mtn.billing.db          							
+             							 drop.mtn.billing.db,          							
              							 load.quartz.schema, 
 								 download.mtn.from.hudson, 
 								 copy.mtn.to.tomcat, 
