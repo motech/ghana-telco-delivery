@@ -19,15 +19,22 @@
     <logger name="org.springframework">
         <level value="warn"/>
     </logger>
+     <logger name="metrics">
+        <level value="warn"/>
+    </logger>
     <logger name="org.ektorp">
         <level value="warn"/>
     </logger>
-    <logger name="org.motechproject">
+     <logger name="org.quartz">
         <level value="warn"/>
     </logger>
+    <logger name="org.motechproject">
+        <level value="info"/>
+    </logger>
     <root>
-        <priority value="warn"/>
+        <priority value="info"/>
         <appender-ref ref="production"/>
         <appender-ref ref="console"/>
     </root>
 </log4j:configuration>
+
