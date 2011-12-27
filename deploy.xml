@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="mtn" basedir=".">
+<project name="telco" basedir=".">
     <import file="${basedir}/tomcat-tasks.xml"/>
 
     <!-- *********************** DOWNLOAD ARTIFACTS************************* -->
-    <target name="download.mtn.from.hudson">
+    <target name="download.telco.from.hudson">
         <copy todir="${download.dir}" flatten="true" overwrite="true">
             <resources>
-                <url url="http://${hudson.server}:${hudson.port}/job/${hudson.job.name}/${hudson.build.number}/org.motechproject$ghana-mtn-web/artifact/org.motechproject/ghana-mtn-web/${hudson.release.version}/ghana-mtn-web-${hudson.release.version}.war"/>
+                <url url="http://${hudson.server}:${hudson.port}/job/${hudson.job.name}/${hudson.build.number}/org.motechproject$ghana-telco-web/artifact/org.motechproject/ghana-telco-web/${hudson.release.version}/ghana-telco-web-${hudson.release.version}.war"/>
             </resources>
         </copy>
-        <move file="${download.dir}/ghana-mtn-web-${hudson.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
-        <echo message="downloaded ghana-mtn-web-${hudson.release.version}.war from hudson"/>
+        <move file="${download.dir}/ghana-telco-web-${hudson.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
+        <echo message="downloaded ghana-telco-web-${hudson.release.version}.war from hudson"/>
     </target>
 
-    <target name="download.mtn.from.nexus">
+    <target name="download.telco.from.nexus">
         <copy todir="${download.dir}" flatten="true" overwrite="true">
             <resources>
-                <url url="http://${nexus.server}:${nexus.port}/content/repositories/releases/org/motechproject/ghana-mtn/${nexus.release.version}/ghana-mtn-${nexus.release.version}.war"/>
+                <url url="http://${nexus.server}:${nexus.port}/content/repositories/releases/org/motechproject/ghana-telco/${nexus.release.version}/ghana-telco-${nexus.release.version}.war"/>
             </resources>
         </copy>
-        <move file="${download.dir}/ghana-mtn-${nexus.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
-        <echo message="downloaded ghana-mtn-${nexus.release.version}.war from nexus"/>
+        <move file="${download.dir}/ghana-telco-${nexus.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
+        <echo message="downloaded ghana-telco-${nexus.release.version}.war from nexus"/>
     </target>
 
     <!-- *************************RECREATE COUCHDB************************* -->
-    <target name="drop.mtn.web.db">
+    <target name="drop.telco.web.db">
         <exec executable="curl">
             <arg value="-s"/>
             <arg value="-S"/>
             <arg value="-X"/>
             <arg value="DELETE"/>
-            <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.mtn.web.db}"/>
+            <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.telco.web.db}"/>
         </exec>
     </target>	
     
-    <target name="drop.mtn.billing.db">
+    <target name="drop.telco.billing.db">
         <exec executable="curl">
             <arg value="-s"/>
             <arg value="-S"/>
             <arg value="-X"/>
             <arg value="DELETE"/>
-            <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.mtn.billing.db}"/>
+            <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.telco.billing.db}"/>
         </exec>
     </target>
 
@@ -106,81 +106,81 @@
                 <path refid="lib.path"/>
             </classpath>
         </java>
-        <echo message="seed data loaded into ${couchdb.mtn.web.db} database"/>
+        <echo message="seed data loaded into ${couchdb.telco.web.db} database"/>
     </target>
 
     <!-- *************************DEPLOY TARGETS************************* -->
-    <target name="deploy.mtn.from.hudson.and.reset.db" depends="stop.tomcat, 
-             							 drop.mtn.web.db,    
-             							 drop.mtn.billing.db,          							
+    <target name="deploy.telco.from.hudson.and.reset.db" depends="stop.tomcat,
+             							 drop.telco.web.db,
+             							 drop.telco.billing.db,
              							 load.quartz.schema, 
-								 download.mtn.from.hudson, 
-								 copy.mtn.to.tomcat, 
+								 download.telco.from.hudson,
+								 copy.telco.to.tomcat,
 								 start.tomcat, 	
 								 set.properties,
 								 set.hudson.version,
 								 load.seed.data,
 								 restart.tomcat"
-            description="Deploy mtn by 
+            description="Deploy telco by
                          1) fetching artifact from hudson, 
-                         2) recreate mtn-web couchdb database with seed data
+                         2) recreate telco-web couchdb database with seed data
                          3) clearing quartz mysql jobdatastore
 			 4) set properties for war"/>
 
-    <target name="deploy.mtn.from.nexus.and.reset.db" depends="stop.tomcat, 
-             							drop.mtn.web.db, 
-             							drop.mtn.billing.db,
+    <target name="deploy.telco.from.nexus.and.reset.db" depends="stop.tomcat,
+             							drop.telco.web.db,
+             							drop.telco.billing.db,
              							load.quartz.schema, 
-								download.mtn.from.nexus, 
-								copy.mtn.to.tomcat, 
+								download.telco.from.nexus,
+								copy.telco.to.tomcat,
 								start.tomcat, 
 								set.properties,
 								set.nexus.version,
 								 load.seed.data,
 								restart.tomcat"
-            description="Deploy mtn by 
+            description="Deploy telco by
                          1) fetching artifact from nexus, 
-                         2) recreate mtn-web couchdb database with seed data
+                         2) recreate telco-web couchdb database with seed data
                          3) clearing quartz mysql jobdatastore
                          4) set properties for war"/>
 
-    <target name="deploy.mtn.from.hudson" depends="stop.tomcat, 
- 						    download.mtn.from.hudson, 
-						    copy.mtn.to.tomcat,
+    <target name="deploy.telco.from.hudson" depends="stop.tomcat,
+ 						    download.telco.from.hudson,
+						    copy.telco.to.tomcat,
 						    start.tomcat, 						   
 					            set.properties,
 						    set.hudson.version,
 						    load.seed.data,
 						    restart.tomcat"
-            description="Deploy mtn from hudson without recreating database and seed data"/>
+            description="Deploy telco from hudson without recreating database and seed data"/>
 
-    <target name="deploy.mtn.from.nexus" depends="stop.tomcat, 
-						   download.mtn.from.nexus, 
-						   copy.mtn.to.tomcat, 
+    <target name="deploy.telco.from.nexus" depends="stop.tomcat,
+						   download.telco.from.nexus,
+						   copy.telco.to.tomcat,
  						   start.tomcat, 						 
 					           set.properties,
 						   set.nexus.version,
 						   load.seed.data,
 						   restart.tomcat"
-            description="Deploy mtn from nexus without recreating database and seed data"/>
+            description="Deploy telco from nexus without recreating database and seed data"/>
 
-    <target name="deploy.mtn.from.local" depends="stop.tomcat, 
+    <target name="deploy.telco.from.local" depends="stop.tomcat,
 					  	   copy.local.war,
  						   start.tomcat, 						
 					           set.properties,
 					           load.seed.data,
 						   restart.tomcat"
-            description="Deploy mtn from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder without recreating database and seed data"/>
+            description="Deploy telco from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder without recreating database and seed data"/>
 
-    <target name="deploy.mtn.from.local.and.reset.db" depends="stop.tomcat,
-                                                   drop.mtn.web.db,     
-                                                   drop.mtn.billing.db,                                           
+    <target name="deploy.telco.from.local.and.reset.db" depends="stop.tomcat,
+                                                   drop.telco.web.db,
+                                                   drop.telco.billing.db,
                                                    load.quartz.schema, 
 					  	   copy.local.war,
  						   start.tomcat,						  
 					           set.properties,
 						   load.seed.data,
 						   restart.tomcat"
-            description="Deploy mtn from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder. Also recreates the mtn database."/>
+            description="Deploy telco from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder. Also recreates the telco database."/>
 
 </project>

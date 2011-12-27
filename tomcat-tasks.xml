@@ -21,7 +21,7 @@
         <format property="cctimestamp" pattern="yyyy-MM-dd HH:mm:ss"/>
     </tstamp>
 
-    <target name="copy.mtn.to.tomcat">
+    <target name="copy.telco.to.tomcat">
         <echo message="Deploying to tomcat at ${tomcat.url} with tomcat home ${tomcat.home}"/>
         <delete dir="${tomcat.home}/webapps/${app.name}"/>
         <copy file="${download.dir}/${app.name}.war" tofile="${tomcat.home}/webapps/${app.name}.war" overwrite="true"/>
