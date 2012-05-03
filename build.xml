@@ -4,22 +4,15 @@
 
     <!-- *********************** DOWNLOAD ARTIFACTS************************* -->
     <target name="download.telco.from.hudson">
-        <copy todir="${download.dir}" flatten="true" overwrite="true">
-            <resources>
-                <url url="http://${hudson.server}:${hudson.port}/job/${hudson.job.name}/${hudson.build.number}/org.motechproject$ghana-telco-web/artifact/org.motechproject/ghana-telco-web/${hudson.release.version}/ghana-telco-web-${hudson.release.version}.war"/>
-            </resources>
-        </copy>
-        <move file="${download.dir}/ghana-telco-web-${hudson.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
+
+        <get dest="${download.dir}/${app.name}.war"
+                    src="http://${hudson.server}:${hudson.port}/job/${hudson.job.name}/${hudson.build.number}/org.motechproject$ghana-telco-web/artifact/org.motechproject/ghana-telco-web/${hudson.release.version}/ghana-telco-web-${hudson.release.version}.war"/>
         <echo message="downloaded ghana-telco-web-${hudson.release.version}.war from hudson"/>
     </target>
 
     <target name="download.telco.from.nexus">
-        <copy todir="${download.dir}" flatten="true" overwrite="true">
-            <resources>
-                <url url="http://${nexus.server}:${nexus.port}/content/repositories/releases/org/motechproject/ghana-telco/${nexus.release.version}/ghana-telco-${nexus.release.version}.war"/>
-            </resources>
-        </copy>
-        <move file="${download.dir}/ghana-telco-${nexus.release.version}.war" tofile="${download.dir}/${app.name}.war"/>
+        <get dest="${download.dir}/${app.name}.war"
+             src="http://${nexus.server}:${nexus.port}/content/repositories/releases/org/motechproject/ghana-telco/${nexus.release.version}/ghana-telco-${nexus.release.version}.war"/>
         <echo message="downloaded ghana-telco-${nexus.release.version}.war from nexus"/>
     </target>
 
