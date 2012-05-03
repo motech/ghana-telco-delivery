@@ -37,6 +37,19 @@
         </exec>
     </target>
 
+    <target name="drop.telco.smpp.db">
+        <exec executable="curl">
+            <arg value="-s"/>
+            <arg value="-S"/>
+            <arg value="-X"/>
+            <arg value="DELETE"/>
+            <arg value="http://${couchdb.server}:${couchdb.port}/${couchdb.telco.smpp.db}"/>
+        </exec>
+    </target>
+
+
+    <target name="drop.all.dbs" depends="drop.telco.web.db,drop.telco.billing.db,drop.telco.smpp.db,load.quartz.schema" description="Drop all couch db and quartz schema"/>
+
     <!-- *************************RECREATE MYSQL************************* -->
     <target name="load.quartz.schema">
         <path id="dependencies">
@@ -106,9 +119,7 @@
 
     <!-- *************************DEPLOY TARGETS************************* -->
     <target name="deploy.telco.from.hudson.and.reset.db" depends="stop.tomcat,
-             							 drop.telco.web.db,
-             							 drop.telco.billing.db,
-             							 load.quartz.schema, 
+             			         drop.all.dbs,
 								 download.telco.from.hudson,
 								 copy.telco.to.tomcat,
 								 start.tomcat, 	
@@ -123,9 +134,7 @@
 			 4) set properties for war"/>
 
     <target name="deploy.telco.from.nexus.and.reset.db" depends="stop.tomcat,
-             							drop.telco.web.db,
-             							drop.telco.billing.db,
-             							load.quartz.schema, 
+                                drop.all.dbs,
 								download.telco.from.nexus,
 								copy.telco.to.tomcat,
 								start.tomcat, 
@@ -143,7 +152,7 @@
  						    download.telco.from.hudson,
 						    copy.telco.to.tomcat,
 						    start.tomcat, 						   
-					            set.properties,
+					        set.properties,
 						    set.hudson.version,
 						    load.seed.data,
 						    restart.tomcat"
@@ -153,7 +162,7 @@
 						   download.telco.from.nexus,
 						   copy.telco.to.tomcat,
  						   start.tomcat, 						 
-					           set.properties,
+					       set.properties,
 						   set.nexus.version,
 						   load.seed.data,
 						   restart.tomcat"
@@ -162,18 +171,16 @@
     <target name="deploy.telco.from.local" depends="stop.tomcat,
 					  	   copy.local.war,
  						   start.tomcat, 						
-					           set.properties,
-					           load.seed.data,
+					       set.properties,
+					       load.seed.data,
 						   restart.tomcat"
             description="Deploy telco from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder without recreating database and seed data"/>
 
     <target name="deploy.telco.from.local.and.reset.db" depends="stop.tomcat,
-                                                   drop.telco.web.db,
-                                                   drop.telco.billing.db,
-                                                   load.quartz.schema, 
+                           drop.all.dbs,
 					  	   copy.local.war,
  						   start.tomcat,						  
-					           set.properties,
+					       set.properties,
 						   load.seed.data,
 						   restart.tomcat"
             description="Deploy telco from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder. Also recreates the telco database."/>
