@@ -211,7 +211,7 @@
         </echo>
     </target>
 
-    <target name="deploy.telco.delivery.from.nexus" depends="stop.tomcat,
+    <target name="deploy.telco.delivery.from.hudson" depends="stop.tomcat,
 						   download.telco.delivery.from.hudson,
 						   copy.telco.delivery.to.tomcat,
  						   start.tomcat,
