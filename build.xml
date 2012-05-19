@@ -188,9 +188,9 @@
 
      <!-- Delivery App Targets -->
 
-    <target name="download.telco.delivery.from.nexus">
+    <target name="download.telco.delivery.from.hudson">
         <get dest="${download.dir}/${delivery.app.name}.war"
-             src="http://${nexus.server}:${nexus.port}/view/ghana-telco/job/Ghana-Telco-Delivery/lastSuccessfulBuild/org.motechproject.telco$telco-batch/artifact/org.motechproject.telco/telco-batch/${nexus.telco.delivery.release.version}/telco-batch-${nexus.telco.delivery.release.version}.war"/>
+             src="http://${hudson.server}:${nexus.port}/view/ghana-telco/job/Ghana-Telco-Delivery/lastSuccessfulBuild/org.motechproject.telco$telco-batch/artifact/org.motechproject.telco/telco-batch/${nexus.telco.delivery.release.version}/telco-batch-${nexus.telco.delivery.release.version}.war"/>
         <echo message="downloaded ghana-telco-delivery-${nexus.telco.delivery.release.version}.war from nexus"/>
     </target>
 
@@ -212,7 +212,7 @@
     </target>
 
     <target name="deploy.telco.delivery.from.nexus" depends="stop.tomcat,
-						   download.telco.delivery.from.nexus,
+						   download.telco.delivery.from.hudson,
 						   copy.telco.delivery.to.tomcat,
  						   start.tomcat,
 					       set.telco.delivery.properties,
