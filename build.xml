@@ -185,4 +185,38 @@
 						   restart.tomcat"
             description="Deploy telco from locally downloaded war(set 'local.war.file' in deploy.properties) in artifacts folder. Also recreates the telco database."/>
 
+
+     <!-- Delivery App Targets -->
+
+    <target name="download.telco.delivery.from.nexus">
+        <get dest="${download.dir}/${delivery.app.name}.war"
+             src="http://${nexus.server}:${nexus.port}/view/ghana-telco/job/Ghana-Telco-Delivery/lastSuccessfulBuild/org.motechproject.telco$telco-batch/artifact/org.motechproject.telco/telco-batch/${nexus.telco.delivery.release.version}/telco-batch-${nexus.telco.delivery.release.version}.war"/>
+        <echo message="downloaded ghana-telco-delivery-${nexus.telco.delivery.release.version}.war from nexus"/>
+    </target>
+
+    <target name="set.telco.delivery.properties">
+        <copy overwrite="true" todir="${tomcat.home}/webapps/${delivery.app.name}/WEB-INF/classes"
+              file="${basedir}/properties/${env}/delivery/batch-default.properties"/>
+        <copy overwrite="true" todir="${tomcat.home}/webapps/${delivery.app.name}/WEB-INF/classes"
+              file="${basedir}/properties/${env}/delivery/messages.properties"/>
+        <copy overwrite="true" todir="${tomcat.home}/webapps/${delivery.app.name}/WEB-INF/classes"
+              file="${basedir}/properties/${env}/delivery/log4j.xml"/>
+    </target>
+
+    <target name="set.telco.delivery.nexus.version">
+        <echo file="${tomcat.home}/webapps/${delivery.app.name}/META-INF/version.txt">
+            nexus.server=${nexus.server}
+            nexus.release.version=${nexus.telco.delivery.release.version}
+            deploy.time=${cctimestamp}
+        </echo>
+    </target>
+
+    <target name="deploy.telco.delivery.from.nexus" depends="stop.tomcat,
+						   download.telco.delivery.from.nexus,
+						   copy.telco.delivery.to.tomcat,
+ 						   start.tomcat,
+					       set.telco.delivery.properties,
+						   set.telco.delivery.nexus.version,
+						   restart.tomcat"
+            description="Deploy telco from nexus without recreating database and seed data"/>
 </project>

@@ -28,6 +28,13 @@
         <delete dir="${tomcat.home}/work/Catalina/localhost/${app.name}"/>
     </target>
 
+    <target name="copy.telco.delivery.to.tomcat">
+        <echo message="Deploying to tomcat at ${tomcat.url} with tomcat home ${tomcat.home}"/>
+        <delete dir="${tomcat.home}/webapps/${delivery.app.name}"/>
+        <copy file="${download.dir}/${delivery.app.name}.war" tofile="${tomcat.home}/webapps/${delivery.app.name}.war" overwrite="true"/>
+        <delete dir="${tomcat.home}/work/Catalina/localhost/${delivery.app.name}"/>
+    </target>
+
     <target name="copy.local.war">
 	<echo message="Deploying to tomcat at ${tomcat.url} with tomcat home ${tomcat.home}"/>
         <delete dir="${tomcat.home}/webapps/${app.name}"/>
