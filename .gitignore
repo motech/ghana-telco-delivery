@@ -1,3 +1,6 @@
 artifacts/*
 logs/*
 .idea/*
+**/*.iml
+**/*.log
+**/.idea

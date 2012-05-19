@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+                                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="org.motechproject.telco"/>
+
+    <batch:job-repository id="jobRepository"/>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository"/>
+    </bean>
+
+
+    <!--couchdb replication -->
+
+    <batch:job id="replicationJob">
+        <batch:step id="dbReplicationStepIndex">
+            <batch:tasklet ref="dbReplicator"/>
+        </batch:step>
+    </batch:job>
+
+    <bean id="replicationJobLauncher" class="org.motechproject.telco.QuartzLauncher">
+        <constructor-arg ref="replicationJob"/>
+        <constructor-arg ref="jobLauncher"/>
+    </bean>
+
+    <bean id="replicationJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="replicationJobLauncher"/>
+        <property name="targetMethod" value="run"/>
+    </bean>
+
+    <bean id="replicationCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="replicationJobDetail"/>
+        <property name="cronExpression" value="0 0 5 * * ?"/> <!-- Everyday 5 AM -->
+    </bean>
+
+
+    <!--couchdb view indexing -->
+
+    <batch:job id="viewIndexerJob">
+        <batch:step id="stepIndex">
+            <batch:tasklet ref="viewIndexer"/>
+        </batch:step>
+    </batch:job>
+
+    <bean id="viewIndexJobLauncher" class="org.motechproject.telco.QuartzLauncher">
+        <constructor-arg ref="viewIndexerJob"/>
+        <constructor-arg ref="jobLauncher"/>
+    </bean>
+
+    <bean id="viewIndexJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="viewIndexJobLauncher"/>
+        <property name="targetMethod" value="run"/>
+    </bean>
+
+    <bean id="viewIndexCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="viewIndexJobDetail"/>
+        <property name="cronExpression" value="0 0 0/3 1/1 * ? *"/>    <!-- Every 3 Hours -->
+    </bean>
+
+    <!--couchdb compaction-->
+
+    <batch:job id="dbCompactorJob">
+        <batch:step id="dbCompactorStepIndex">
+            <batch:tasklet ref="dbCompactor"/>
+        </batch:step>
+    </batch:job>
+
+    <bean id="dbCompactorJobLauncher" class="org.motechproject.telco.QuartzLauncher">
+        <constructor-arg ref="dbCompactorJob"/>
+        <constructor-arg ref="jobLauncher"/>
+    </bean>
+
+    <bean id="dbCompactorJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="dbCompactorJobLauncher"/>
+        <property name="targetMethod" value="run"/>
+    </bean>
+
+    <bean id="dbCompactorCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="dbCompactorJobDetail"/>
+        <property name="cronExpression" value="0 0 0 * * ?"/>    <!-- Everyday 12 AM -->
+        <!--<property name="cronExpression" value="0 0/2 * 1/1 * ? *"/>-->
+    </bean>
+
+    <!-- Schedule to fire all cron jobs -->
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="viewIndexCronTrigger"/>
+                <ref bean="dbCompactorCronTrigger"/>
+                <ref bean="replicationCronTrigger"/>
+            </list>
+        </property>
+    </bean>
+</beans>
