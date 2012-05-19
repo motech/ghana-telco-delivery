@@ -190,7 +190,7 @@
 
     <target name="download.telco.delivery.from.hudson">
         <get dest="${download.dir}/${delivery.app.name}.war"
-             src="http://${hudson.server}:${nexus.port}/view/ghana-telco/job/Ghana-Telco-Delivery/lastSuccessfulBuild/org.motechproject.telco$telco-batch/artifact/org.motechproject.telco/telco-batch/${nexus.telco.delivery.release.version}/telco-batch-${nexus.telco.delivery.release.version}.war"/>
+             src="http://${hudson.server}:${hudson.port}/view/ghana-telco/job/Ghana-Telco-Delivery/lastSuccessfulBuild/org.motechproject.telco$telco-batch/artifact/org.motechproject.telco/telco-batch/${nexus.telco.delivery.release.version}/telco-batch-${nexus.telco.delivery.release.version}.war"/>
         <echo message="downloaded ghana-telco-delivery-${nexus.telco.delivery.release.version}.war from nexus"/>
     </target>
 
