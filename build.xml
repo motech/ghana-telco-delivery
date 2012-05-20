@@ -56,17 +56,19 @@
             <fileset file="./lib/postgresql-9.1-901.jdbc4.jar"/>
         </path>
         <sql driver="${postgres.driver}"
-             url="jdbc:postgres://${postgres.server}:${postgres.port}:${postgres.other.db.name}?autoReconnect=true"
+             url="jdbc:postgres://${postgres.server}:${postgres.port}/${postgres.other.db.name}"
              userid="${postgres.user}"
              classpathref="dependencies"
+             autocommit="true"
              password="${postgres.password}">
             drop database ${postgres.db.name};
             create database ${postgres.db.name};
         </sql>
         <sql driver="${postgres.driver}"
-             url="jdbc:postgres://${postgres.server}:${postgres.port}:${postgres.db.name}?autoReconnect=true"
+             url="jdbc:postgres://${postgres.server}:${postgres.port}/${postgres.db.name}"
              userid="${postgres.user}"
              classpathref="dependencies"
+             autocommit="true"
              password="${postgres.password}"
              src="./sql/tables_postgres.sql">
         </sql>
