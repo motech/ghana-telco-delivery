@@ -53,7 +53,7 @@
     <!-- *************************RECREATE postgres************************* -->
     <target name="load.quartz.schema">
         <path id="dependencies">
-            <fileset file="./lib/postgres-connector-java-5.1.13.jar"/>
+            <fileset file="./lib/postgresql-9.1-901.jdbc4.jar"/>
         </path>
         <sql driver="${postgres.driver}"
              url="jdbc:postgres://${postgres.server}:${postgres.port}:${postgres.other.db.name}?autoReconnect=true"
