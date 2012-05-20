@@ -50,27 +50,27 @@
 
     <target name="drop.all.dbs" depends="drop.telco.web.db,drop.telco.billing.db,drop.telco.smpp.db,load.quartz.schema" description="Drop all couch db and quartz schema"/>
 
-    <!-- *************************RECREATE MYSQL************************* -->
+    <!-- *************************RECREATE postgres************************* -->
     <target name="load.quartz.schema">
         <path id="dependencies">
-            <fileset file="./lib/mysql-connector-java-5.1.13.jar"/>
+            <fileset file="./lib/postgres-connector-java-5.1.13.jar"/>
         </path>
-        <sql driver="${mysql.driver}"
-             url="jdbc:mysql://${mysql.server}:${mysql.port}/${mysql.db.name}?autoReconnect=true"
-             userid="${mysql.user}"
+        <sql driver="${postgres.driver}"
+             url="jdbc:postgres://${postgres.server}:${postgres.port}:${postgres.other.db.name}?autoReconnect=true"
+             userid="${postgres.user}"
              classpathref="dependencies"
-             password="${mysql.password}">
-            drop database ${mysql.db.name};
-            create database ${mysql.db.name};
+             password="${postgres.password}">
+            drop database ${postgres.db.name};
+            create database ${postgres.db.name};
         </sql>
-        <sql driver="${mysql.driver}"
-             url="jdbc:mysql://${mysql.server}:${mysql.port}/${mysql.db.name}?autoReconnect=true"
-             userid="${mysql.user}"
+        <sql driver="${postgres.driver}"
+             url="jdbc:postgres://${postgres.server}:${postgres.port}:${postgres.db.name}?autoReconnect=true"
+             userid="${postgres.user}"
              classpathref="dependencies"
-             password="${mysql.password}"
-             src="./sql/tables_mysql_innodb.sql">
+             password="${postgres.password}"
+             src="./sql/tables_postgres.sql">
         </sql>
-        <echo message="recreated schema for ${mysql.db.name}"/>
+        <echo message="recreated schema for ${postgres.db.name}"/>
     </target>
     <!-- *************************SET PROPERTIES************************* -->
     <target name="set.hudson.version">
@@ -130,7 +130,7 @@
             description="Deploy telco by
                          1) fetching artifact from hudson, 
                          2) recreate telco-web couchdb database with seed data
-                         3) clearing quartz mysql jobdatastore
+                         3) clearing quartz postgres jobdatastore
 			 4) set properties for war"/>
 
     <target name="deploy.telco.from.nexus.and.reset.db" depends="stop.tomcat,
@@ -145,7 +145,7 @@
             description="Deploy telco by
                          1) fetching artifact from nexus, 
                          2) recreate telco-web couchdb database with seed data
-                         3) clearing quartz mysql jobdatastore
+                         3) clearing quartz postgres jobdatastore
                          4) set properties for war"/>
 
     <target name="deploy.telco.from.hudson" depends="stop.tomcat,
